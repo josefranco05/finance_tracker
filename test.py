@@ -4,7 +4,6 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 from typing_extensions import List
 import math
-import pandas as pd
 
 with Session(engine) as session:
     # Insert a new user
