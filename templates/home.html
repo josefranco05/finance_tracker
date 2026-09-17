@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+
+{% block title %}Home · MyFin{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Bienvenido a MyFin!</h1>
+
+<section class="hero">
+  <p class="eyebrow">MyFin - Finanzas Personales</p>
+  <h2 class="hero-heading">Hazlo por ti. Hazlo por el. Hazlo por ustedes y por el hermoso futuro que les espera.</h2>
+  <a class="btn btn-primary" href="/register_transaction">+ Registrar transacción</a>
+</section>
+
+<section class="cards-grid">
+  {% for card in summary_cards %}
+  <article class="card">
+    <div class="card-icon">
+    </div>
+    <div class="card-text">
+      <p class="card-amount">{{ card.valor }}</p>
+      <p class="card-label">{{ card.concepto }}</p>
+    </div>
+  </article>
+  {% endfor %}
+</section>
+{% endblock %}

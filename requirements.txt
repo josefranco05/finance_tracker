@@ -1,0 +1,15 @@
+# MyFin - Finance Tracker dependencies
+# Versions pinned to what is installed in the project venv (Python 3.14)
+
+fastapi==0.139.2
+uvicorn[standard]==0.50.2
+
+# ORM / database
+sqlalchemy==2.0.51
+psycopg2-binary==2.9.12
+
+# Templates / static
+jinja2==3.1.6
+
+# test.py / data exploration
+pandas==3.0.3

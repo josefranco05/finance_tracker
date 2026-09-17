@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block title %}Transactions · MyFin{% endblock %}
+
+{% block content %}
+<h1 class="page-title">Transacciones</h1>
+
+<div class="page-actions">
+  <div class="tabs">
+    <button class="tab active">Resumen</button>
+    <button class="tab">Ingresos</button>
+    <button class="tab">Egresos</button>
+  </div>
+  <div class="page-filters">
+    <div class="search-field">
+      <p>Fecha Inicial</p>
+      <input class="search-input" type="date" placeholder="Start">
+    </div>
+    <div class="search-field">
+      <p>Fecha Final</p>
+      <input class="search-input" type="date" placeholder="End">
+    </div>
+  </div>
+</div>
+
+<section class="transactions-card">
+  <div class="table-scroll">
+    <table class="transactions-table">
+      <thead>
+        <tr>
+          <th class="checkbox-cell"><input type="checkbox" aria-label="Select all"></th>
+          <th>Fecha de Transaccion</th>
+          <th>Tipo</th>
+          <th>Descripcion</th>
+          <th>Valor</th>
+          <th>Usuario</th>
+          <th>Categoria</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for transaction in transactions_list %}
+        <tr>
+          <td class="checkbox-cell"><input type="checkbox" aria-label="Select transaction"></td>
+          <td>{{ transaction.date }}</td>
+          <td>{{ transaction.transaction_type }}</td>
+          <td>{{ transaction.description }}</td>
+          <td>{{ transaction.value }}</td>
+          <td>{{ transaction.user_id }}</td>
+          <td>{{ transaction.category_id }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="pagination">
+    <button class="pagination-button">Previous</button>
+    <button class="page-number active">1</button>
+    <button class="page-number">2</button>
+    <button class="page-number">3</button>
+    <button class="page-number">4</button>
+    <button class="page-number">5</button>
+    <span>...</span>
+    <button class="page-number">11</button>
+    <button class="pagination-button">Next</button>
+  </div>
+</section>
+{% endblock %}

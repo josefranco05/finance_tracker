@@ -1,0 +1,88 @@
+{% extends "layout.html" %}
+
+{% block title %}Registrar transacción · MyFin{% endblock %}
+
+{% block content %}
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Registrar transacción</h1>
+      <p class="page-subtitle">Registra un ingreso, un gasto o una deuda</p>
+    </div>
+  </div>
+
+  <div class="settings-layout">
+    <section class="panel" aria-label="Nueva transacción">
+      <!-- TODO(backend): apunta el action al endpoint que crees para guardar la transacción -->
+      <form method="post" action="#" id="transactionForm">
+        <div class="form-grid">
+
+          <!-- tipo: mandatory, three buttons in one line -->
+          <fieldset class="field fieldset field--full">
+            <legend>Tipo <span class="req">*</span></legend>
+            <div class="choice-group">
+              <label class="choice-pill">
+                <input type="radio" name="tipo" value="ingreso" required>
+                <span><span class="pill-glyph" aria-hidden="true">&#8593;</span> Ingreso</span>
+              </label>
+              <label class="choice-pill">
+                <input type="radio" name="tipo" value="gasto" required>
+                <span><span class="pill-glyph" aria-hidden="true">&#8595;</span> Gasto</span>
+              </label>
+              <label class="choice-pill">
+                <input type="radio" name="tipo" value="deuda" required>
+                <span><span class="pill-glyph" aria-hidden="true">&#37;</span> Deuda</span>
+              </label>
+            </div>
+          </fieldset>
+
+          <!-- categoria: mandatory dropdown (dummy data, fill later) -->
+          <div class="field">
+            <label for="categoria">Categoría <span class="req">*</span></label>
+            <select id="categoria" name="categoria" required>
+              <option value="" disabled selected>Selecciona una categoría</option>
+              <option value="alimentacion">Alimentación</option>
+              <option value="transporte">Transporte</option>
+              <option value="servicios">Servicios (agua, luz, internet)</option>
+              <option value="vivienda">Vivienda / Arriendo</option>
+              <option value="salud">Salud</option>
+              <option value="educacion">Educación</option>
+              <option value="ocio">Ocio y entretenimiento</option>
+              <option value="salario">Salario</option>
+              <option value="negocios">Negocios / Otros ingresos</option>
+              <option value="deudas">Deudas y préstamos</option>
+              <option value="otros">Otros</option>
+            </select>
+          </div>
+
+          <!-- valor: mandatory amount -->
+          <div class="field">
+            <label for="valor">Valor <span class="req">*</span></label>
+            <div class="input-group">
+              <span class="input-prefix" aria-hidden="true">$</span>
+              <input type="number" id="valor" name="valor" placeholder="0.00"
+                     min="0.01" step="0.01" inputmode="decimal" required>
+            </div>
+          </div>
+
+          <!-- fecha: mandatory date picker, defaults to today (user's local date) -->
+          <div class="field">
+            <label for="fecha">Fecha <span class="req">*</span></label>
+            <input type="date" id="fecha" name="fecha" data-today required>
+          </div>
+
+          <!-- descripcion: optional -->
+          <div class="field">
+            <label for="descripcion">Descripción <span class="opt">(opcional)</span></label>
+            <input type="text" id="descripcion" name="descripcion"
+                   placeholder="Ej. Salario mensual" maxlength="255">
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="reset" class="btn btn-ghost">Limpiar</button>
+          <button type="submit" class="btn btn-primary">Guardar transacción</button>
+        </div>
+      </form>
+    </section>
+  </div>
+{% endblock %}

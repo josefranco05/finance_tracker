@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}MyFin - Finanzas Personales{% endblock %}</title>
+  <meta name="description" content="Software para Finanzas Personales">
+  <meta name="author" content="Jose Miguel Franco - Dipper">
+
+  <!-- Open Graph Tags: The title of the page for social media sharing. It can match the title tag or be more descriptive. -->
+  <meta property="og:title" content="MyFin">
+
+  <!-- Open Graph Tags: Typically set to "website" for static sites or "article" for content-heavy pages. -->
+  <meta property="og:type" content="website">
+
+  <!-- Open Graph Tags: The URL of the page, used to ensure link previews resolve to the correct page. -->
+  <meta property="og:url" content="">
+
+  <!-- Open Graph Tags: URL of an image that represents the page. Useful for link previews. -->
+  <meta property="og:image" content="">
+
+  <!-- Open Graph Tags: Provides an alternative text for the image to improve accessibility. -->
+  <meta property="og:image:alt" content="">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', path='css/styles.css') }}?v=6">
+  <meta name="theme-color" content="#EFE8FB">
+  <link rel="icon" href="{{ url_for('static', path='icons/icon.png') }}" sizes="any">
+
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', path='icons/icon.png') }}">
+
+</head>
+
+<body>
+  <div class="layout">
+
+    <!-- Sidebar (lateral nav). On desktop it collapses to icons only until hovered.
+           On tablet / phone it becomes an off-canvas drawer opened with the hamburger. -->
+    <aside class="sidebar" id="sidebar" aria-label="Menú principal">
+      <div class="logo-mark">
+        <a class="logo-icon" href="/" aria-label="MyFin - inicio">
+          <img src="{{ url_for('static', path='icons/icon.png') }}" alt="MyFin">
+        </a>
+        <div class="logo-text">
+          <span class="logo-title">MyFin</span>
+          <span class="logo-sub">by Dipper</span>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <a class="nav-item" href="/" data-nav="home">
+          <img class="nav-icon" src="{{ url_for('static', path='icons/home.svg') }}" alt="" aria-hidden="true">
+          <span class="nav-label">Inicio</span>
+        </a>
+        <a class="nav-item" href="/transactions" data-nav="transactions">
+          <img class="nav-icon" src="{{ url_for('static', path='icons/transactions.svg') }}" alt="" aria-hidden="true">
+          <span class="nav-label">Transacciones</span>
+        </a>
+        <a class="nav-item" href="/dashboard" data-nav="dashboard">
+          <img class="nav-icon" src="{{ url_for('static', path='icons/dashboard.svg') }}" alt="" aria-hidden="true">
+          <span class="nav-label">Panel de Control</span>
+        </a>
+      </nav>
+    </aside>
+
+    <div class="overlay" id="overlay" hidden></div>
+
+    <!-- Workspace: topbar + page content -->
+    <div class="workspace">
+      <header class="topbar">
+        <button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menú" aria-expanded="false"
+          aria-controls="sidebar">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <div class="topbar-actions">
+          <a class="icon-btn" href="/user_settings" aria-label="Perfil">
+            <img src="{{ url_for('static', path='icons/profile.svg') }}" alt="" aria-hidden="true">
+          </a>
+          <a class="icon-btn" href="/user_settings" aria-label="Ajustes">
+            <img src="{{ url_for('static', path='icons/settings.svg') }}" alt="" aria-hidden="true">
+          </a>
+          <button class="icon-btn bell-btn" id="bellBtn" type="button" aria-label="Notificaciones"
+            aria-haspopup="dialog" aria-expanded="false">
+            <img src="{{ url_for('static', path='icons/notifications.svg') }}" alt="" aria-hidden="true">
+            <span class="badge-dot" id="bellBadge" hidden></span>
+          </button>
+
+          <span class="topbar-sep" aria-hidden="true"></span>
+          <!-- TODO(backend): crea la ruta /logout y la lógica de cierre de sesión -->
+          <a class="icon-btn logout-btn" href="/logout" aria-label="Cerrar sesión" title="Cerrar sesión">
+            <img src="{{ url_for('static', path='icons/logout.svg') }}" alt="" aria-hidden="true">
+          </a>
+        </div>
+      </header>
+
+      <main class="main">
+        {% block content %}
+        {% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <!-- Little window that pops from the notifications symbol -->
+  <div class="notif-panel" id="notifPanel" role="dialog" aria-label="Notificaciones" hidden>
+    <div class="notif-header">
+      <h2 class="notif-title">Notificaciones</h2>
+      <div class="notif-header-actions">
+        <button class="link-btn" id="notifClear" type="button">Marcar todo leído</button>
+        <button class="icon-btn icon-btn--sm" id="notifClose" type="button" aria-label="Cerrar notificaciones"
+          aria-hidden="true">&times;</button>
+      </div>
+    </div>
+
+    <ul class="notif-list" id="notifList">
+      <li class="notif-item unread">
+        <span class="notif-dot notif-dot--purple" aria-hidden="true"></span>
+        <div class="notif-body">
+          <p class="notif-text">Ingreso registrado: <strong>Salario mensual</strong></p>
+          <p class="notif-time">Hace 2 horas</p>
+        </div>
+        <span class="notif-tag">Nuevo</span>
+      </li>
+      <li class="notif-item unread">
+        <span class="notif-dot notif-dot--yellow" aria-hidden="true"></span>
+        <div class="notif-body">
+          <p class="notif-text">Superaste el presupuesto de <strong>Alimentación</strong> en 15%</p>
+          <p class="notif-time">Hace 5 horas</p>
+        </div>
+        <span class="notif-tag">Nuevo</span>
+      </li>
+      <li class="notif-item">
+        <span class="notif-dot notif-dot--purple" aria-hidden="true"></span>
+        <div class="notif-body">
+          <p class="notif-text">Recordatorio: <strong>pago de deuda</strong> programado para mañana</p>
+          <p class="notif-time">Ayer</p>
+        </div>
+      </li>
+      <li class="notif-item">
+        <span class="notif-dot notif-dot--yellow" aria-hidden="true"></span>
+        <div class="notif-body">
+          <p class="notif-text">Tu <strong>balance del mes</strong> ya está disponible</p>
+          <p class="notif-time">Hace 2 días</p>
+        </div>
+      </li>
+    </ul>
+
+    <div class="notif-empty" id="notifEmpty" hidden>
+      <p>¡Todo al día! No tienes notificaciones pendientes.</p>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', path='js/main.js') }}?v=3" defer></script>
+</body>
+
+</html>

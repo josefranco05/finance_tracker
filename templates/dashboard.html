@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard · MyFin{% endblock %}
+
+{% block content %}
+{% set fallback_cards = fallback_cards %}
+{% set cards = summary_cards | default(fallback_cards, true) %}
+{% set balance_bars = balance_bars %}
+{% set categories = categories %}
+
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Panel de Control</h1>
+    <p class="page-subtitle">Resumen de tus finanzas este mes</p>
+  </div>
+  <a class="btn btn-primary" href="/register_transaction">+ Registrar transacción</a>
+</div>
+
+<section class="cards-grid" aria-label="Resumen">
+  {% for card in cards %}
+  <article class="card">
+    <div class="card-icon{% if loop.index is even %} card-icon--yellow{% endif %}" aria-hidden="true">
+      {% if loop.index == 1 %}&#8593;{% elif loop.index == 2 %}&#8595;{% elif loop.index == 3 %}&#37;{% else %}&#177;{%
+      endif %}
+    </div>
+    <div class="card-text">
+      <p class="card-amount">$ {{ "{:,.0f}".format(card.valor | float) }}</p>
+      <p class="card-label">{{ card.concepto }}</p>
+    </div>
+  </article>
+  {% endfor %}
+</section>
+
+<div class="dash-grid" style="margin-top: 24px;">
+  <!-- Monthly balance (CSS-only bars) -->
+  <section class="panel" aria-label="Balance mensual">
+    <div class="section-head">
+      <h2 class="section-title">Balance mensual</h2>
+      <span class="badge badge--yellow">Últimos 6 meses</span>
+    </div>
+    <div class="bars">
+      {% for bar in balance_bars %}
+      <div class="bar-col">
+        <span class="bar-value">{{ bar.value }}</span>
+        <div class="bar{% if loop.index is even %} bar--alt{% endif %}" style="height: {{ bar.height }};"></div>
+        <span class="bar-label">{{ bar.label }}</span>
+      </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  <div class="dash-stack">
+    <!-- Spending by category -->
+    <section class="panel" aria-label="Gastos por categoría">
+      <div class="section-head">
+        <h2 class="section-title">Gastos por categoría</h2>
+      </div>
+      <ul class="cat-list">
+        {% for cat in categories %}
+        <li class="cat-row">
+          <span class="cat-name">{{ cat.name }}</span>
+          <span class="cat-track"><span class="cat-fill{% if cat.alt %} cat-fill--yellow{% endif %}"
+              style="width: {{ cat.width }};"></span></span>
+          <span class="cat-value">{{ cat.value }}</span>
+        </li>
+        {% endfor %}
+      </ul>
+    </section>
+  </div>
+</div>
+
+<!-- Recent transactions -->
+<section class="panel" style="margin-top: 20px;" aria-label="Transacciones recientes">
+  <div class="section-head">
+    <h2 class="section-title">Transacciones recientes</h2>
+    <a class="link-btn" href="/transactions">Ver todas &rarr;</a>
+  </div>
+  <div class="table-scroll">
+    <table class="transactions-table recent-table">
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Descripción</th>
+          <th>Categoría</th>
+          <th>Tipo</th>
+          <th>Monto</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>2026-07-25</td>
+          <td>Salario mensual</td>
+          <td>Ingresos</td>
+          <td><span class="badge">Ingreso</span></td>
+          <td class="amount-positive">+ $ 8.000.000</td>
+        </tr>
+        <tr>
+          <td>2026-07-23</td>
+          <td>Supermercado Éxito</td>
+          <td>Alimentación</td>
+          <td><span class="badge badge--yellow">Gasto</span></td>
+          <td class="amount-negative">- $ 420.000</td>
+        </tr>
+        <tr>
+          <td>2026-07-20</td>
+          <td>Pago cuota crédito</td>
+          <td>Deuda</td>
+          <td><span class="badge badge--yellow">Gasto</span></td>
+          <td class="amount-negative">- $ 1.250.000</td>
+        </tr>
+        <tr>
+          <td>2026-07-18</td>
+          <td>Transporte (pasaje)</td>
+          <td>Transporte</td>
+          <td><span class="badge badge--yellow">Gasto</span></td>
+          <td class="amount-negative">- $ 180.000</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
