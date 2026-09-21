@@ -1,5 +1,5 @@
 from database import Base, engine
-from models.models import User, Categories, Transactions
+from models.models import User, Transactions
 from datetime import datetime
 from sqlalchemy.orm import Session
 from typing_extensions import List

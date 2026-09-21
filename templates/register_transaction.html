@@ -2,87 +2,203 @@
 
 {% block title %}Registrar transacción · MyFin{% endblock %}
 
+{#
+  CATEGORÍAS POR TIPO
+  Las categorías las entrega la ruta que renderiza esta página:
+
+      @app.get("/register_transaction", include_in_schema=False)
+      async def register_transaction(request: Request):
+          return templates.TemplateResponse(
+              request,
+              "register_transaction.html",
+              {"categorias": CATEGORIAS_ESTANDAR},
+          )
+
+  Formato esperado: un diccionario por tipo, cada lista con los NOMBRES
+  de las categorías (strings):
+
+      {"ingreso": ["Salario", ...], "gasto": [...], "deuda": [...]}
+
+  El formulario envía el NOMBRE de la categoría seleccionada.
+#}
+
+{% set categorias_por_tipo = categorias | default({}, true) %}
+
 {% block content %}
-  <div class="page-header">
-    <div>
-      <h1 class="page-title">Registrar transacción</h1>
-      <p class="page-subtitle">Registra un ingreso, un gasto o una deuda</p>
-    </div>
+<div class="page-header">
+  <div>
+    <h1 class="page-title">Registrar transacción</h1>
+    <p class="page-subtitle">Registra un ingreso, un gasto o una deuda</p>
   </div>
+</div>
 
-  <div class="settings-layout">
-    <section class="panel" aria-label="Nueva transacción">
-      <!-- TODO(backend): apunta el action al endpoint que crees para guardar la transacción -->
-      <form method="post" action="#" id="transactionForm">
-        <div class="form-grid">
+<div class="settings-layout">
+  <section class="panel" aria-label="Nueva transacción">
+    <!-- TODO(backend): apunta el action al endpoint que crees para guardar la transacción -->
+    <form method="post" action="#" id="transactionForm">
+      <div class="form-grid">
 
-          <!-- tipo: mandatory, three buttons in one line -->
-          <fieldset class="field fieldset field--full">
-            <legend>Tipo <span class="req">*</span></legend>
-            <div class="choice-group">
-              <label class="choice-pill">
-                <input type="radio" name="tipo" value="ingreso" required>
-                <span><span class="pill-glyph" aria-hidden="true">&#8593;</span> Ingreso</span>
-              </label>
-              <label class="choice-pill">
-                <input type="radio" name="tipo" value="gasto" required>
-                <span><span class="pill-glyph" aria-hidden="true">&#8595;</span> Gasto</span>
-              </label>
-              <label class="choice-pill">
-                <input type="radio" name="tipo" value="deuda" required>
-                <span><span class="pill-glyph" aria-hidden="true">&#37;</span> Deuda</span>
-              </label>
-            </div>
-          </fieldset>
-
-          <!-- categoria: mandatory dropdown (dummy data, fill later) -->
-          <div class="field">
-            <label for="categoria">Categoría <span class="req">*</span></label>
-            <select id="categoria" name="categoria" required>
-              <option value="" disabled selected>Selecciona una categoría</option>
-              <option value="alimentacion">Alimentación</option>
-              <option value="transporte">Transporte</option>
-              <option value="servicios">Servicios (agua, luz, internet)</option>
-              <option value="vivienda">Vivienda / Arriendo</option>
-              <option value="salud">Salud</option>
-              <option value="educacion">Educación</option>
-              <option value="ocio">Ocio y entretenimiento</option>
-              <option value="salario">Salario</option>
-              <option value="negocios">Negocios / Otros ingresos</option>
-              <option value="deudas">Deudas y préstamos</option>
-              <option value="otros">Otros</option>
-            </select>
+        <!-- tipo: obligatorio, tres botones en una línea -->
+        <fieldset class="field fieldset field--full">
+          <legend>Tipo <span class="req">*</span></legend>
+          <div class="choice-group">
+            <label class="choice-pill">
+              <input type="radio" name="tipo" value="ingreso" required>
+              <span><span class="pill-glyph" aria-hidden="true">&#8593;</span> Ingreso</span>
+            </label>
+            <label class="choice-pill">
+              <input type="radio" name="tipo" value="gasto" required>
+              <span><span class="pill-glyph" aria-hidden="true">&#8595;</span> Gasto</span>
+            </label>
+            <label class="choice-pill">
+              <input type="radio" name="tipo" value="deuda" required>
+              <span><span class="pill-glyph" aria-hidden="true">&#37;</span> Deuda</span>
+            </label>
           </div>
+        </fieldset>
 
-          <!-- valor: mandatory amount -->
-          <div class="field">
-            <label for="valor">Valor <span class="req">*</span></label>
-            <div class="input-group">
-              <span class="input-prefix" aria-hidden="true">$</span>
-              <input type="number" id="valor" name="valor" placeholder="0.00"
-                     min="0.01" step="0.01" inputmode="decimal" required>
-            </div>
-          </div>
+        <!-- categoria: obligatoria, se rellena según el tipo elegido (bloque scripts) -->
+        <div class="field">
+          <label for="categoria">Categoría <span class="req">*</span></label>
+          <!-- Se deja habilitada y `required` en el HTML para que, sin JavaScript,
+               el navegador bloquee el envío. El valor enviado es el NOMBRE de la
+               categoría. -->
+          <select id="categoria" name="categoria" required aria-describedby="categoria-hint">
+            <option value="" disabled selected>Selecciona un tipo primero</option>
+          </select>
+          <p class="hint" id="categoria-hint" aria-live="polite">Elige un tipo para ver sus categorías.</p>
+          <noscript>
+            <p class="hint">Activa JavaScript para ver las categorías según el tipo.</p>
+          </noscript>
+        </div>
 
-          <!-- fecha: mandatory date picker, defaults to today (user's local date) -->
-          <div class="field">
-            <label for="fecha">Fecha <span class="req">*</span></label>
-            <input type="date" id="fecha" name="fecha" data-today required>
-          </div>
-
-          <!-- descripcion: optional -->
-          <div class="field">
-            <label for="descripcion">Descripción <span class="opt">(opcional)</span></label>
-            <input type="text" id="descripcion" name="descripcion"
-                   placeholder="Ej. Salario mensual" maxlength="255">
+        <!-- valor: obligatorio -->
+        <div class="field">
+          <label for="valor">Valor <span class="req">*</span></label>
+          <div class="input-group">
+            <span class="input-prefix" aria-hidden="true">$</span>
+            <input type="number" id="valor" name="valor" placeholder="0.00" min="0.01" step="0.01" inputmode="decimal"
+              required>
           </div>
         </div>
 
-        <div class="form-actions">
-          <button type="reset" class="btn btn-ghost">Limpiar</button>
-          <button type="submit" class="btn btn-primary">Guardar transacción</button>
+        <!-- fecha: obligatoria, por defecto hoy (fecha local del usuario) -->
+        <div class="field">
+          <label for="fecha">Fecha <span class="req">*</span></label>
+          <input type="date" id="fecha" name="fecha" data-today required>
         </div>
-      </form>
-    </section>
-  </div>
+
+        <!-- descripcion: opcional -->
+        <div class="field">
+          <label for="descripcion">Descripción <span class="opt">(opcional)</span></label>
+          <input type="text" id="descripcion" name="descripcion" placeholder="Ej. Salario mensual" maxlength="255">
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="reset" class="btn btn-ghost">Limpiar</button>
+        <button type="submit" class="btn btn-primary">Guardar transacción</button>
+      </div>
+    </form>
+  </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  (() => {
+    'use strict';
+
+    /* {"ingreso": [...], "gasto": [...], "deuda": [...]} */
+    const CATEGORIAS = {{ categorias_por_tipo | tojson }} || {};
+
+    const form = document.getElementById('transactionForm');
+    const select = document.getElementById('categoria');
+    const hint = document.getElementById('categoria-hint');
+    if (!form || !select) return;
+
+    const ETIQUETA_TIPO = { ingreso: 'Ingreso', gasto: 'Gasto', deuda: 'Deuda' };
+
+    let tipoActual = null;
+
+    /* Acepta strings o, por si acaso, objetos con `category` / `nombre`. */
+    const nombreDe = (item) => {
+      if (typeof item === 'string') return item.trim();
+      if (item && typeof item === 'object') {
+        const n = item.category ?? item.nombre ?? item.name;
+        return n === null || n === undefined ? '' : String(n).trim();
+      }
+      return '';
+    };
+
+    const opcionPlaceholder = (texto) => {
+      const opt = document.createElement('option');
+      opt.value = '';
+      opt.textContent = texto;
+      opt.disabled = true;
+      opt.selected = true;
+      return opt;
+    };
+
+    const pintarCategorias = (tipo) => {
+      select.innerHTML = '';
+
+      if (!tipo) {
+        select.disabled = true;
+        select.appendChild(opcionPlaceholder('Selecciona un tipo primero'));
+        if (hint) hint.textContent = 'Elige un tipo para ver sus categorías.';
+        return;
+      }
+
+      const nombres = (CATEGORIAS[tipo] || []).map(nombreDe).filter(Boolean);
+      const etiqueta = ETIQUETA_TIPO[tipo] || tipo;
+
+      if (!nombres.length) {
+        select.disabled = false;
+        select.appendChild(opcionPlaceholder('No hay categorías para este tipo'));
+        if (hint) hint.textContent = 'No hay categorías para ' + etiqueta + '.';
+        return;
+      }
+
+      select.disabled = false;
+      select.appendChild(opcionPlaceholder('Selecciona una categoría'));
+      nombres.forEach((nombre) => {
+        const opt = document.createElement('option');
+        opt.value = nombre;
+        opt.textContent = nombre;
+        select.appendChild(opt);
+      });
+
+      if (hint) {
+        hint.textContent = etiqueta + ': ' + nombres.length + ' categoría'
+          + (nombres.length === 1 ? '' : 's') + ' disponibles.';
+      }
+    };
+
+    form.querySelectorAll('input[name="tipo"]').forEach((radio) => {
+      radio.addEventListener('change', () => {
+        if (radio.value === tipoActual) return;
+        tipoActual = radio.value;
+        pintarCategorias(tipoActual);
+      });
+    });
+
+    form.addEventListener('reset', () => {
+      tipoActual = null;
+      /* El reset del formulario ocurre DESPUÉS de los listeners, así que se
+         rehace en el siguiente tick (y de paso se vuelve a poner la fecha de hoy). */
+      window.setTimeout(() => {
+        pintarCategorias(null);
+        const fecha = document.getElementById('fecha');
+        if (fecha && !fecha.value) {
+          const ahora = new Date();
+          const local = new Date(ahora.getTime() - ahora.getTimezoneOffset() * 60000);
+          fecha.value = local.toISOString().slice(0, 10);
+        }
+      }, 0);
+    });
+
+    pintarCategorias(null);
+  })();
+</script>
 {% endblock %}

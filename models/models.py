@@ -15,32 +15,22 @@ class User(Base):
     email: Mapped[str] = mapped_column(String(50), nullable=False, unique=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     create_date: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, default=lambda: datetime.now(UTC))
-    deleted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, default=None)
+    status: Mapped[str] = mapped_column(String(20), nullable=True, default=None)
 
-    transactions: Mapped[list[Transactions]] = relationship(back_populates="user_id_transactions")
-    categories: Mapped[list[Categories]] = relationship(back_populates="user_id_categories")
+    transactions: Mapped[list[Transactions]] = relationship(back_populates="owner")
 
-class Categories(Base):
-    __tablename__ = "categories"
-
-    category_id: Mapped[int] = mapped_column(primary_key=True)
-    category: Mapped[str] = mapped_column(String(50), nullable=False)
-    obsolete: Mapped[bool] = mapped_column(nullable=False, default=False)
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), nullable=True, index=True)
-
-    user_id_categories: Mapped[User] = relationship(back_populates="categories")
 
 class Transactions(Base):
     __tablename__ = "transactions"
 
-    transaction_id: Mapped[int] = mapped_column(primary_key=True)
+    transaction_id: Mapped[int] = mapped_column(primary_key=True, index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id"), nullable=False, index=True)
-    category_id: Mapped[int] = mapped_column(ForeignKey("categories.category_id"), nullable=True, index=True)
+    category: Mapped[str] = mapped_column(String(100), nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     transaction_type: Mapped[str] = mapped_column(String(255), nullable=False)
-    valor: Mapped[float] = mapped_column(nullable=False)
+    value: Mapped[float] = mapped_column(nullable=False)
     date: Mapped[date] = mapped_column(Date, nullable=False)
     created_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, default=lambda: datetime.now(UTC))
     updated_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True, default=lambda: datetime.now(UTC))
 
-    user_id_transactions: Mapped[User] = relationship(back_populates="transactions")
+    owner: Mapped[User] = relationship(back_populates="transactions")

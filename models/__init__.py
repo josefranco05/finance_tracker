@@ -13,6 +13,6 @@ scripts deben ejecutarse desde la raíz del proyecto (donde están `database.py`
     python -m models.models
 """
 
-from .models import Categories, Transactions, User
+from .models import  User, Transactions
 
-__all__ = ["User", "Categories", "Transactions"]
+__all__ = ["User", "Transactions"]

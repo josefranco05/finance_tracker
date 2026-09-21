@@ -37,6 +37,7 @@
 </head>
 
 <body>
+  {% block body %}
   <div class="layout">
 
     <!-- Sidebar (lateral nav). On desktop it collapses to icons only until hovered.
@@ -158,6 +159,10 @@
   </div>
 
   <script src="{{ url_for('static', path='js/main.js') }}?v=3" defer></script>
+
+  <!-- Scripts propios de cada página (se ejecutan después de main.js) -->
+  {% block scripts %}{% endblock %}
+  {% endblock %}
 </body>
 
 </html>
